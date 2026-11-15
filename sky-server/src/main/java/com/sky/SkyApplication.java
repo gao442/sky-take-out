@@ -14,3 +14,8 @@ public class SkyApplication {
         log.info("server started");
     }
 }
+/*
+Nginx可以反向代理：提高访问速度
+，进行负载的均衡，在集群的服务器中给服务器分配
+还能保证后端安全，不会把后端的地址暴露在互联网上
+ */

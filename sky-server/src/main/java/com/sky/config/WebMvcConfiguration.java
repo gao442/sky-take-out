@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -54,14 +55,38 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     /**
+     * Knife4j 静态资源映射
+     * doc.html 与 webjars 下的 js/css 都打包在 knife4j-openapi3-ui 的 META-INF/resources 中
+     * springdoc 的自动配置只注册 /swagger-ui/**，不会注册 /webjars/**，所以必须在这里显式映射
+     *
+     * @param registry
+     */
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        log.info("开始设置接口文档静态资源映射...");
+        registry.addResourceHandler("/doc.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
+
+    /**
      * 扩展消息转换器，统一日期时间格式
      *
      * @param converters
      */
     @Override
+    //扩展springmvc的消息转换器，对日期进行和石化
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        //创建一个消息转化器
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        //需要为消息转化器设置一个对象转化器
+        //将Java对象序列化为json数据
         converter.setObjectMapper(new JacksonObjectMapper());
+        //将消息转化器加到容器里面
         converters.add(0, converter);
     }
+
+
+
 }
