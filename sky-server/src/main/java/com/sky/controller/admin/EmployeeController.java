@@ -11,6 +11,7 @@ import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
+import jdk.management.jfr.RemoteRecordingStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -83,19 +84,56 @@ public class EmployeeController {
         return Result.success();
     }
 
+    /**
+     * 分页查询
+     *
+     * @return
+     */
     @GetMapping("/page")
     public Result<PageResult> pageEmp(EmployeePageQueryDTO employeePageQueryDTO){
 
         PageResult pageResult= employeeService.pageEmp(employeePageQueryDTO);
         return Result.success(pageResult);
     }
+    /**
+     * 员工状态修改
+     *
+     * @return
+     */
     @PostMapping("/status/{status}")
     //按参数名从 URL 查询字符串里取值
-    public Result startOrStop(@PathVariable Integer status, @RequestParam("empId") Long id){
+    public Result startOrStop(@PathVariable Integer status, @RequestParam Long id){
 
         employeeService.startOrStop(status,id);
 
         return Result.success();
     }
+
+    /**
+     * 根据id查询员工
+     *
+     * @return
+     */
+    @GetMapping("/{id}")
+    public Result<Employee> selectEmpById(@PathVariable Long id){
+
+        Employee employee = employeeService.selectEmpById(id);
+        employee.setPassword("*****");
+        return Result.success(employee);
+    }
+
+    /**
+     * 修改员工
+     *
+     * @return
+     */
+    @PutMapping()
+    public Result updateEmp(@RequestBody EmployeeDTO employeeDTO){
+
+        employeeService.updateEmp(employeeDTO);
+        return Result.success();
+    }
+
+
 
 }
