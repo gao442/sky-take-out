@@ -89,5 +89,13 @@ public class EmployeeController {
         PageResult pageResult= employeeService.pageEmp(employeePageQueryDTO);
         return Result.success(pageResult);
     }
+    @PostMapping("/status/{status}")
+    //按参数名从 URL 查询字符串里取值
+    public Result startOrStop(@PathVariable Integer status, @RequestParam("empId") Long id){
+
+        employeeService.startOrStop(status,id);
+
+        return Result.success();
+    }
 
 }

@@ -84,9 +84,15 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         //将Java对象序列化为json数据
         converter.setObjectMapper(new JacksonObjectMapper());
         //将消息转化器加到容器里面
+        //converters就是整个mvc的转化器
         converters.add(0, converter);
     }
+/*
+第 1 步：JacksonObjectMapper 定义了格式规则
+sky-common 里的 JacksonObjectMapper 为 LocalDateTime 全局注册了序列化器：
 
+第 2 步：WebMvcConfiguration 把它注册为全局转换器
+ */
 
 
 }
