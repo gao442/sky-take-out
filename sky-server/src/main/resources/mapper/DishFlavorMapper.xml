@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.DishFlavorMapper">
+
+
+    <insert id="saveBatch">
+        insert into dish_flavor(dish_id,name,value)
+        values
+        <foreach collection="flavors" item="df" separator=",">
+            /*collection要遍历的集合*/
+            /*item每次遍历时，当前元素的别名*/
+            /*separator每次循环之间用逗号分隔*/
+            (#{df.dishId},#{df.name},#{df.value})
+        </foreach>
+    </insert>
+    <!--
+insert into dish_flavor(dish_id, name, value)
+values
+    (1, '甜味', '["甜"]'),
+    (1, '忌口', '["不要香菜"]')
+   -->
+
+
+</mapper>
