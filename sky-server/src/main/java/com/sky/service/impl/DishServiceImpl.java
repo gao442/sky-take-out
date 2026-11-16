@@ -1,13 +1,18 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.annotation.AutoFill;
 import com.sky.dto.DishDTO;
+import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.enumeration.OperationType;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.result.PageResult;
 import com.sky.service.DishService;
+import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +28,7 @@ public class DishServiceImpl implements DishService {
     private DishFlavorMapper dishFlavorMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void save(DishDTO dishDTO) {
         Dish dish=new Dish();
         BeanUtils.copyProperties(dishDTO,dish);
@@ -39,4 +44,44 @@ public class DishServiceImpl implements DishService {
             dishFlavorMapper.saveBatch(flavors);
         }
     }
+
+    @Override
+    public PageResult pageDish(DishPageQueryDTO dishPageQueryDTO) {
+
+
+        PageHelper.startPage(dishPageQueryDTO.getPage(),dishPageQueryDTO.getPageSize());
+        Page<DishVO> page = dishMapper.pageDish(dishPageQueryDTO);
+        PageResult pageResult=new PageResult(page.getTotal(),page.getResult());
+        return pageResult;
+    }
+
+
 }
+/*
+REQUIRED（默认）
+有事务就加入，没有就新建。最常用
+
+REQUIRES_NEW
+总是新建事务，把当前事务挂起
+
+SUPPORTS
+有就加入，没有就以非事务方式执行
+
+NOT_SUPPORTED
+总是以非事务方式执行，挂起当前事
+ */
+/*
+同类内部调用：this.save() 自调用不走代理，事务失效 → 需要注入自身或拆到别的 Bean
+
+方法不是 public：Spring 事务基于代理，非 public 方法无效
+
+异常被 catch 吞掉：
+方法内部 try-catch 了异常且没抛出，
+Spring 感知不到，不会回滚(没有捕捉到事务自己抛出处理事务失效)
+
+数据库引擎不支持：MySQL 的表必须是 InnoDB，MyISAM 不支持事务
+
+@Transactional 加在接口上而非实现类上（Spring 官方推荐加在实现类）
+
+
+ */
