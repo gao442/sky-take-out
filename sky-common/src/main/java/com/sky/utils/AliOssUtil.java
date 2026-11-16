@@ -65,4 +65,11 @@ public class AliOssUtil {
 
         return stringBuilder.toString();
     }
+
 }
+
+/*
+工具类:封装 OSS SDK 的上传逻辑
+不在工具类内部进行属性注入，保持工具类纯粹性
+
+ */

@@ -48,6 +48,16 @@ sky:
     user-ttl: 7200000
     user-token-name: authentication
 
+
+  #主配置文件没有写死的配置信息，换个生产环境就用不了了
+  #数据从开发环境的配置文件里找
+  alioss:
+    endpoint: ${sky.alioss.endpoint}
+    access-key-id: ${OSS_ACCESS_KEY_ID}
+    access-key-secret: ${OSS_ACCESS_KEY_SECRET}
+    bucket-name: ${sky.alioss.bucket-name}
+#Spring Boot 的 ${...} 占位符会优先从系统环境变量里解析，
+  #这样账号密码不用写进任何配置文件，提交代码也不会泄露密钥。
 # 接口文档配置（Knife4j 4.x 底层为 springdoc-openapi）
 springdoc:
   api-docs:
