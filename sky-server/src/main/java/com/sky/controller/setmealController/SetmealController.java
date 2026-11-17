@@ -61,8 +61,6 @@ public class SetmealController {
     @DeleteMapping
     public Result deleteBatch(@RequestParam List<Long> ids){
 
-
-
         setmealService.deleteBatch(ids);
         return Result.success();
     }

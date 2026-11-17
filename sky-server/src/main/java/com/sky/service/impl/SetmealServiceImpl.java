@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
@@ -91,6 +92,17 @@ public  class SetmealServiceImpl implements SetmealService {
         Setmeal setmeal = new Setmeal();
         setmeal.setId(id);
         setmeal.setStatus(status);
+        // 仅起售套餐时校验关联菜品，停售不受菜品状态限制
+        if (StatusConstant.ENABLE.equals(status)) {
+            List<SetmealDish> setmealDishes = setmealDishMapper.getSetmealDishBySetmealId(id);
+            for (SetmealDish setmealDish : setmealDishes) {
+                Integer dishStatus = setmealDishMapper.getSetmealDishStatus(setmealDish);
+                if (!StatusConstant.ENABLE.equals(dishStatus)) {
+                    throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                }
+            }
+        }
+
         setmealMapper.startOrStop(setmeal);
     }
 
@@ -104,6 +116,7 @@ public  class SetmealServiceImpl implements SetmealService {
                 throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
             }
         }
+        setmealDishMapper.deleteSetmealByids(ids);
         setmealMapper.deleteBatch(ids);
 
     }
