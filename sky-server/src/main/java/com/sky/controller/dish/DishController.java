@@ -45,4 +45,25 @@ public class DishController {
         dishService.deleteBatch(ids);
         return Result.success();
     }
+
+    /*
+    数据回显
+     */
+    @GetMapping("/{id}")
+    public Result<DishVO> listDishById(@PathVariable("id") Long id){
+
+        DishVO dishVO = dishService.listDishById(id);
+        return Result.success(dishVO);
+    }
+
+    /*
+    修改菜品
+     */
+    @PutMapping
+    public Result update(@RequestBody DishDTO dishDTO){
+        dishService.updateWithFlavor(dishDTO);
+        return Result.success();
+    }
+
+
 }

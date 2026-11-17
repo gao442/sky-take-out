@@ -10,6 +10,7 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.enumeration.OperationType;
+import com.sky.exception.BaseException;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -88,6 +90,53 @@ public class DishServiceImpl implements DishService {
         //删除菜品关联的口味数据
         dishFlavorMapper.deleteFlavorByDishIds(ids);
 
+    }
+
+    @Override
+    public DishVO listDishById(Long id) {
+
+        Dish dish=dishMapper.getByid(id);
+        if (dish == null) {
+            throw new BaseException(MessageConstant.DISH_NOT_FOUND);
+        }
+        DishVO dishVO=new DishVO();
+
+        BeanUtils.copyProperties(dish,dishVO);
+        List<DishFlavor> dishFlavorList=dishFlavorMapper.listDishFlavorByDishId(id);
+        dishVO.setFlavors(dishFlavorList);
+
+        return dishVO;
+
+    }
+
+    @Override
+    @Transactional
+    public void updateWithFlavor(DishDTO dishDTO) {
+
+        Long id = dishDTO.getId();
+        if (id == null) {
+            throw new BaseException(MessageConstant.DISH_NOT_FOUND);
+        }
+
+        Dish dish=new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+
+        int rows = dishMapper.update(dish);
+        if (rows == 0) {
+            throw new BaseException(MessageConstant.DISH_NOT_FOUND);
+        }
+
+        List<DishFlavor> dishFlavorList = dishDTO.getFlavors();
+        List<Long> idList=new ArrayList<>();
+        idList.add(dishDTO.getId());
+
+        dishFlavorMapper.deleteFlavorByDishIds(idList);
+
+        if (dishFlavorList != null && !dishFlavorList.isEmpty()) {
+            dishFlavorList.forEach(flavor ->
+                    flavor.setDishId(dishDTO.getId()));
+            dishFlavorMapper.saveBatch(dishFlavorList);
+        }
     }
 
 
