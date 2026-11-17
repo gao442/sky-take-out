@@ -43,13 +43,12 @@
         </where>
     </delete>
 
-    <select id="getSetmealDishStatus" resultType="java.lang.Integer">
-        select d.status from setmeal_dish as s
-        left join dish as d
-        on s.dish_id=d.id
-        <where>
-            s.id=#{id}
-        </where>
+    <select id="countUnavailableDishesBySetmealId" resultType="java.lang.Integer">
+        select count(*)
+        from setmeal_dish as s
+        left join dish as d on s.dish_id = d.id
+        where s.setmeal_id = #{setmealId}
+          and (d.status is null or d.status != #{enabledStatus})
     </select>
 
 </mapper>

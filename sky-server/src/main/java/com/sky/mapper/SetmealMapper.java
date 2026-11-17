@@ -6,10 +6,8 @@ import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.SetmealVO;
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.apache.poi.sl.draw.geom.GuideIf;
 
 import java.util.List;
 
@@ -29,7 +27,7 @@ public interface SetmealMapper {
 
     Page<SetmealVO> getSetmealPage(SetmealPageQueryDTO setmealPageQueryDTO);
 
-    @AutoFill(OperationType.INSERT)
+    @AutoFill(OperationType.UPDATE)
     void update(Setmeal setmeal);
 
     SetmealVO getSetmealById(Long id);
@@ -40,7 +38,7 @@ public interface SetmealMapper {
     void deleteBatch(List<Long> ids);
 
     @Select("select status from setmeal where id=#{id}")
-    Integer getStatusByid(Long id);
+    Integer getStatusById(Long id);
 
 
 }

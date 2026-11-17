@@ -4,14 +4,13 @@ import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.vo.SetmealVO;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
 public interface SetmealService {
-    void InsertSetmeal(SetmealDTO setmealDTO);
+    void insertSetmeal(SetmealDTO setmealDTO);
 
-    PageResult PageSetmeal(SetmealPageQueryDTO setmealPageQueryDTO);
+    PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 
     void update(SetmealDTO setmealDTO);
 

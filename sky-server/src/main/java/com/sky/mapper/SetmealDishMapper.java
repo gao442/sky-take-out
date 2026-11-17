@@ -1,10 +1,9 @@
 package com.sky.mapper;
 
-import com.github.pagehelper.Page;
 import com.sky.entity.Dish;
-import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -30,5 +29,6 @@ public interface SetmealDishMapper {
 
     void deleteSetmealByids(List<Long> ids);
 
-    Integer getSetmealDishStatus(SetmealDish setmealDish);
+    int countUnavailableDishesBySetmealId(@Param("setmealId") Long setmealId,
+                                          @Param("enabledStatus") Integer enabledStatus);
 }
