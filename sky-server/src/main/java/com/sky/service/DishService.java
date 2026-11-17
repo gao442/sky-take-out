@@ -5,9 +5,12 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.vo.DishVO;
 
+import java.util.List;
+
 public interface DishService {
     void save(DishDTO dishDTO);
 
     PageResult pageDish(DishPageQueryDTO dishPageQueryDTO);
 
+    void deleteBatch(List<Long> ids);
 }
