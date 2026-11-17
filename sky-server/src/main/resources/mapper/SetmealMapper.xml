@@ -35,4 +35,30 @@
             </if>
         </set>
     </update>
+
+    <select id="getSetmealById" resultType="com.sky.vo.SetmealVO">
+        select s.*, c.name as category_name from setmeal as s
+        left join category as c
+        on s.category_id=c.id
+        <where>
+            s.id=#{id}
+        </where>
+    </select>
+
+    <update id="startOrStop">
+        update setmeal
+        set status = #{status},
+            update_time = #{updateTime},
+            update_user = #{updateUser}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBatch">
+        delete from dish
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

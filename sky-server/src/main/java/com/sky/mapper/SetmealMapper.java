@@ -9,6 +9,9 @@ import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.poi.sl.draw.geom.GuideIf;
+
+import java.util.List;
 
 @Mapper
 public interface SetmealMapper {
@@ -26,5 +29,18 @@ public interface SetmealMapper {
 
     Page<SetmealVO> getSetmealPage(SetmealPageQueryDTO setmealPageQueryDTO);
 
+    @AutoFill(OperationType.INSERT)
     void update(Setmeal setmeal);
+
+    SetmealVO getSetmealById(Long id);
+
+    @AutoFill(OperationType.UPDATE)
+    void startOrStop(Setmeal setmeal);
+
+    void deleteBatch(List<Long> ids);
+
+    @Select("select status from setmeal where id=#{id}")
+    Integer getStatusByid(Long id);
+
+
 }

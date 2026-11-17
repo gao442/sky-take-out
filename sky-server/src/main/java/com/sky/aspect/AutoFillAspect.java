@@ -89,6 +89,9 @@ public class AutoFillAspect {
                 e.printStackTrace();
             }
         }
+        //切面固定取被拦截方法的第一个参数
+        //如果使用注入公共字段，第一个参数必须是对象才行
+        // ，必须是有get set方法的实体类对象
 
 
     }

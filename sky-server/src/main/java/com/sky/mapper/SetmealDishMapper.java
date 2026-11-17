@@ -24,4 +24,7 @@ public interface SetmealDishMapper {
 
 
     void deleteAll(Long setmealId);
+
+    @Select("select * from setmeal_dish where setmeal_id = #{setmealId}")
+    List<SetmealDish> getSetmealDishBySetmealId(Long setmealId);
 }
