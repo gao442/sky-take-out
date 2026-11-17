@@ -40,3 +40,9 @@ public class GlobalExceptionHandler {
         }
     }
 }
+/*
+默认：RuntimeException、Error → 回滚。
+默认：受检异常，例如 IOException → 不自动回滚。
+配置 @Transactional(rollbackFor = Exception.class) → 受检异常也纳入回滚范围。
+因此可以记成：异常传到代理，代理再按规则判断；异常被内部吞掉，代理通常就认为方法正常完成。
+ */

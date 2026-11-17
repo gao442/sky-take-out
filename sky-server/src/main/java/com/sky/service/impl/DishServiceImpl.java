@@ -139,6 +139,12 @@ public class DishServiceImpl implements DishService {
         }
     }
 
+    @Override
+    public List<Dish> listDishByCategoryId(Long categoryId) {
+        List<Dish> list=setmealDishMapper.listDishByCategoryId(categoryId);
+        return list;
+    }
+
 
 }
 /*
@@ -166,6 +172,25 @@ Spring 感知不到，不会回滚(没有捕捉到事务自己抛出处理事务
 数据库引擎不支持：MySQL 的表必须是 InnoDB，MyISAM 不支持事务
 
 @Transactional 加在接口上而非实现类上（Spring 官方推荐加在实现类）
-
-
+*/
+/*
+Service 内部把异常接住，情况就不同了
+@Transactional
+public void updateWithFlavor(DishDTO dishDTO) {
+    try {
+        dishMapper.update(dish);
+        throw new BaseException("修改失败");
+    } catch (BaseException e) {
+        log.error("发生异常", e);
+        // 没有再次抛出
+    }
+}
+不会回滚
+调用 Service
+    ↓
+Service 内部发生异常，但自己处理了
+    ↓
+Service 正常返回
+    ↓
+代理没有收到异常 → 通常提交事务
  */

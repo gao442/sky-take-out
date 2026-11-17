@@ -1,5 +1,9 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.Page;
+import com.sky.entity.Dish;
+import com.sky.entity.Setmeal;
+import com.sky.entity.SetmealDish;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -11,4 +15,13 @@ public interface SetmealDishMapper {
     List<Long> getSetmealidByDishId(Long dishId);
 
     List<Long> getSetmealidByDishIds(List<Long> ids);
+
+
+    void insert(List<SetmealDish> setmealDishList);
+
+
+    List<Dish> listDishByCategoryId(Long categoryId);
+
+
+    void deleteAll(Long setmealId);
 }
