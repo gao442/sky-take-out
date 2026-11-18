@@ -86,7 +86,7 @@ public class AutoFillAspect {
                 setUpdateUser.invoke(entity,currentId);
             } catch (Exception e) {
 
-                e.printStackTrace();
+                throw new RuntimeException("公共字段自动填充失败：" + entity.getClass().getName(), e);
             }
         }
         //切面固定取被拦截方法的第一个参数

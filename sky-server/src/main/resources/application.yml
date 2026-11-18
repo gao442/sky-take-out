@@ -12,6 +12,7 @@ spring:
       host: localhost
       port: 6379
       database: 0
+#不同数据库是完全隔离的
   datasource:
     druid:
       driver-class-name: ${sky.datasource.driver-class-name}

@@ -7,6 +7,9 @@ sky:
     username: root
     password: 20060819
 
+
+
   alioss:
     bucket-name: web-java-anli
     endpoint: oss-cn-beijing.aliyuncs.com
+
