@@ -8,6 +8,7 @@ import com.sky.enumeration.OperationType;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -31,4 +32,5 @@ public interface CategoryMapper {
 
     List<Category> listByType(Integer type);
 
+    List<Category> listForUser(@Param("type") Integer type, @Param("status") Integer status);
 }

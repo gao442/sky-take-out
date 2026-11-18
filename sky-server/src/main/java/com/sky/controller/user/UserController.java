@@ -2,23 +2,25 @@ package com.sky.controller.user;
 
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.UserLoginDTO;
+import com.sky.entity.Category;
+import com.sky.entity.Setmeal;
 import com.sky.entity.User;
 import com.sky.properties.JwtProperties;
 import com.sky.result.Result;
 import com.sky.service.UserService;
 import com.sky.utils.JwtUtil;
+import com.sky.vo.DishItemVO;
+import com.sky.vo.DishVO;
 import com.sky.vo.UserLoginVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/user/user")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -26,7 +28,7 @@ public class UserController {
     @Autowired
     private JwtProperties jwtProperties;
 
-    @PostMapping("/login")
+    @PostMapping("/user/login")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO){
 
         User user = userService.wxLogin(userLoginDTO);
@@ -57,5 +59,28 @@ public class UserController {
     生成 JWT 令牌，连同用户 id、openid 返回给小程序
      */
 
+    @GetMapping("/category/list")
+    public Result<List<Category>> getCategoryByType(@RequestParam(required = false) Integer type){
+        List<Category> categories= userService.getCategoryByType(type);
+        return Result.success(categories);
+    }
+
+    @GetMapping("/dish/list")
+    public Result<List<DishVO>> getDishByCategoryId(Long categoryId){
+        List<DishVO> dishes = userService.getDishByCategoryId(categoryId);
+        return Result.success(dishes);
+    }
+
+    @GetMapping("/setmeal/list")
+    public Result<List<Setmeal>> getSetmealByCategoryId(Long categoryId){
+        List<Setmeal> setmealList= userService.getSetmealByCategoryId(categoryId);
+        return Result.success(setmealList);
+    }
+
+    @GetMapping("/setmeal/dish/{id}")
+    public Result<List<DishItemVO>> getDishBySetmealId(@PathVariable("id") Long id){
+        List<DishItemVO> dishItemVOS = userService.getDishBySetmealId(id);
+        return Result.success(dishItemVOS);
+    }
 
 }

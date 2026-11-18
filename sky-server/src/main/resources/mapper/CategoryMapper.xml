@@ -42,4 +42,17 @@
         order by sort asc, update_time desc
     </select>
 
+    <select id="listForUser" resultType="com.sky.entity.Category">
+        select * from category
+        <where>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        order by sort asc, update_time desc
+    </select>
+
 </mapper>

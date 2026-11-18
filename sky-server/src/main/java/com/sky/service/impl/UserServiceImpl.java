@@ -3,19 +3,22 @@ package com.sky.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.UserLoginDTO;
-import com.sky.entity.User;
+import com.sky.entity.*;
 import com.sky.exception.LoginFailedException;
-import com.sky.mapper.UserMapper;
+import com.sky.mapper.*;
 import com.sky.properties.WeChatProperties;
 import com.sky.service.UserService;
 import com.sky.utils.HttpClientUtil;
+import com.sky.vo.DishItemVO;
+import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -26,6 +29,16 @@ public class UserServiceImpl implements UserService {
     private WeChatProperties weChatProperties;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private CategoryMapper categoryMapper;
+    @Autowired
+    private DishMapper dishMapper;
+    @Autowired
+    private DishFlavorMapper dishFlavorMapper;
+    @Autowired
+    private SetmealMapper setmealMapper;
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
 
     /*
     微信登录
@@ -70,5 +83,40 @@ public class UserServiceImpl implements UserService {
         JSONObject jsonObject = JSON.parseObject(josn);
         String openid = jsonObject.getString("openid");
         return openid;
+    }
+
+    @Override
+    public List<Category> getCategoryByType(Integer type) {
+        //用户端只展示启用的分类，type为空时查询全部类型
+        return categoryMapper.listForUser(type, StatusConstant.ENABLE);
+    }
+
+    @Override
+    public List<DishVO> getDishByCategoryId(Long categoryId) {
+        //用户端只展示起售的菜品
+        List<Dish> dishes = dishMapper.getDishByCategoryId(categoryId, StatusConstant.ENABLE);
+        List<DishVO> dishVOList = new ArrayList<>();
+        for (Dish dish : dishes) {
+            Long dishId = dish.getId();
+            List<DishFlavor> dishFlavorList = dishFlavorMapper.listDishFlavorByDishId(dishId);
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(dish, dishVO);
+            dishVO.setFlavors(dishFlavorList);
+            dishVOList.add(dishVO);
+        }
+        return dishVOList;
+    }
+
+    @Override
+    public List<Setmeal> getSetmealByCategoryId(Long categoryId) {
+        //用户端只展示起售的套餐
+        List<Setmeal> setmealList = setmealMapper.getSetmealByCategoryId(categoryId, StatusConstant.ENABLE);
+        return setmealList;
+    }
+
+    @Override
+    public List<DishItemVO> getDishBySetmealId(Long setmealId) {
+        //联查setmeal_dish与dish，一条SQL取出套餐内菜品的名称、份数、图片和描述
+        return setmealDishMapper.getDishItemBySetmealId(setmealId);
     }
 }

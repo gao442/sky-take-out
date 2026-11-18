@@ -2,6 +2,7 @@ package com.sky.mapper;
 
 import com.sky.entity.Dish;
 import com.sky.entity.SetmealDish;
+import com.sky.vo.DishItemVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -31,4 +32,9 @@ public interface SetmealDishMapper {
 
     int countUnavailableDishesBySetmealId(@Param("setmealId") Long setmealId,
                                           @Param("enabledStatus") Integer enabledStatus);
+
+    @Select("select sd.name, sd.copies, d.image, d.description " +
+            "from setmeal_dish sd left join dish d on sd.dish_id = d.id " +
+            "where sd.setmeal_id = #{setmealId}")
+    List<DishItemVO> getDishItemBySetmealId(Long setmealId);
 }

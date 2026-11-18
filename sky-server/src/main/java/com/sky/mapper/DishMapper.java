@@ -10,6 +10,7 @@ import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -38,6 +39,9 @@ public interface DishMapper {
 
     @AutoFill(OperationType.UPDATE)
     int update(Dish dish);
+
+    @Select("select * from dish where category_id = #{categoryId} and status = #{status}")
+    List<Dish> getDishByCategoryId(@Param("categoryId") Long categoryId, @Param("status") Integer status);
 
 
 }
