@@ -64,4 +64,12 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             return false;
         }
     }
+
+    /**
+     * 请求结束后清理ThreadLocal，防止线程池复用线程时读到上一个请求的id
+     */
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        BaseContext.removeCurrentId();
+    }
 }

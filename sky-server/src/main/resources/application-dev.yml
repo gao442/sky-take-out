@@ -12,4 +12,6 @@ sky:
   alioss:
     bucket-name: web-java-anli
     endpoint: oss-cn-beijing.aliyuncs.com
-
+  wechat:
+    appid: wx842d97f6bff17d5b
+    secret: de672ec4a1efb79c03d8738e67767296

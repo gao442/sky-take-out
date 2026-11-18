@@ -28,3 +28,28 @@ public class ShopController {
 
 
 }
+/*
+1. 引入 Redis 依赖
+sky-server/pom.xml 里的 spring-boot-starter-data-redis
+
+2. 配置 Redis 地址
+application.yml 里的 spring.data.redis
+
+3. 配置 RedisTemplate
+RedisConfiguration.java
+
+4. Redis 服务端正在运行
+你的电脑上
+ */
+
+/*
+① 启动时读取 application.yml（以及 application-dev.yml）
+        ↓
+② 把 spring.data.redis 下的值装进 RedisProperties 对象
+        ↓
+③ 用 RedisProperties 自动创建 RedisConnectionFactory（连接工厂）
+        ↓
+④ 把连接工厂传给你写的 redisTemplate(RedisConnectionFactory ...) 方法
+        ↓
+⑤ 生成的 RedisTemplate 注入到 Controller 的 @Autowired 字段
+ */
