@@ -40,7 +40,6 @@ public  class ShoppingCartServiceImpl implements ShoppingCartService {
 
         if(shoppingCartList!=null && shoppingCartList.size()!= 0){
             ShoppingCart shoppingCart1 = shoppingCartList.get(0);
-            shoppingCart1.setNumber(shoppingCart1.getNumber()+1);
             shoppingCartMapper.updateNumber(shoppingCart1);
         } else {
             shoppingCart.setCreateTime(LocalDateTime.now());
@@ -75,5 +74,32 @@ public  class ShoppingCartServiceImpl implements ShoppingCartService {
         Long userId = BaseContext.getCurrentId();
         List<ShoppingCart> shoppingCartList = shoppingCartMapper.listShoppingCartByUserId(userId);
         return shoppingCartList;
+    }
+
+    @Override
+    public void deleteShoppingCart() {
+        Long userId = BaseContext.getCurrentId();
+        shoppingCartMapper.deleteShoppingCart(userId);
+
+    }
+
+    @Override
+    public void subShoppingCart(ShoppingCartDTO shoppingCartDTO) {
+        //菜品和套餐只是 id 不同，查询/更新条件由动态 SQL 自动选择，不必分支
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        //必须带 userId，否则会改到其他用户的购物车
+        shoppingCart.setUserId(BaseContext.getCurrentId());
+
+        Integer number = shoppingCartMapper.getNumber(shoppingCart);
+        //购物车里没有这件商品，直接返回
+        if (number == null || number <= 0) {
+            return;
+        }
+        if (number == 1) {
+            shoppingCartMapper.deleteShoppingCartOne(shoppingCart);
+        } else {
+            shoppingCartMapper.subNumber(shoppingCart);
+        }
     }
 }

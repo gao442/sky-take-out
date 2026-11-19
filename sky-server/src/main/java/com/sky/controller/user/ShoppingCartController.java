@@ -28,4 +28,18 @@ public class ShoppingCartController {
         List<ShoppingCart> shoppingCartList = shoppingCartService.listShoppingCart();
         return Result.success(shoppingCartList);
     }
+
+    @DeleteMapping("clean")
+    public Result deleteShoppingCart(){
+        shoppingCartService.deleteShoppingCart();
+        return Result.success();
+    }
+
+    @PostMapping("sub")
+    public Result subShoppingCart(@RequestBody ShoppingCartDTO shoppingCartDTO){
+
+        shoppingCartService.subShoppingCart(shoppingCartDTO);
+        return Result.success();
+    }
+
 }
