@@ -50,4 +50,5 @@ public interface AddressMapper {
      */
     @Update("update address_book set is_default = 1 where id = #{id} and user_id = #{userId}")
     void setDefault(@Param("id") Long id, @Param("userId") Long userId);
+
 }

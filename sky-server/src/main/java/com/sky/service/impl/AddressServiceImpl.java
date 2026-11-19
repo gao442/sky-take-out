@@ -22,6 +22,10 @@ public class AddressServiceImpl implements AddressService {
         addressBook.setUserId(BaseContext.getCurrentId());
         addressBook.setIsDefault(0);
         addressMapper.addAddress(addressBook);
+        //不传就用默认值 0"，
+        // 但这是有前提的——SQL 里不能出现这一列。你的插入语句是
+        //如果想要用默认值sql语句里面不能出现isdefault，要不然就自己手动添加
+
     }
 
     @Override
