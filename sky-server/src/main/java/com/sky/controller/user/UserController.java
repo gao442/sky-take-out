@@ -13,6 +13,7 @@ import com.sky.vo.DishItemVO;
 import com.sky.vo.DishVO;
 import com.sky.vo.UserLoginVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
@@ -84,6 +85,7 @@ public class UserController {
     }
 
     @GetMapping("/setmeal/list")
+    @Cacheable(cacheNames = "setmealCache",key = "#categoryId")
     public Result<List<Setmeal>> getSetmealByCategoryId(Long categoryId){
         List<Setmeal> setmealList= userService.getSetmealByCategoryId(categoryId);
         return Result.success(setmealList);
