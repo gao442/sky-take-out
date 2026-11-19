@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.sky.annotation.AutoFill;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
+import com.sky.entity.ShoppingCart;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -43,4 +44,5 @@ public interface SetmealMapper {
 
     @Select("select * from setmeal where category_id = #{categoryId} and status = #{status}")
     List<Setmeal> getSetmealByCategoryId(@Param("categoryId") Long categoryId, @Param("status") Integer status);
+
 }
