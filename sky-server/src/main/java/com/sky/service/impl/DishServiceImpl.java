@@ -145,6 +145,18 @@ public class DishServiceImpl implements DishService {
         return list;
     }
 
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        //只更新 status 字段，其余字段保持 null 由动态 SQL 忽略
+        Dish dish = new Dish();
+        dish.setId(id);
+        dish.setStatus(status);
+        int rows = dishMapper.update(dish);
+        if (rows == 0) {
+            throw new BaseException(MessageConstant.DISH_NOT_FOUND);
+        }
+    }
+
 
 }
 /*

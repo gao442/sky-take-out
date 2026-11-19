@@ -13,6 +13,8 @@ import com.sky.vo.DishItemVO;
 import com.sky.vo.DishVO;
 import com.sky.vo.UserLoginVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -27,6 +29,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private JwtProperties jwtProperties;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @PostMapping("/user/login")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO){
@@ -67,7 +71,15 @@ public class UserController {
 
     @GetMapping("/dish/list")
     public Result<List<DishVO>> getDishByCategoryId(Long categoryId){
-        List<DishVO> dishes = userService.getDishByCategoryId(categoryId);
+        //缓存菜品数据
+        String key ="dish_"+categoryId;
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        List<DishVO> dishes = (List<DishVO>) valueOperations.get(key);
+        if(dishes!= null && dishes.size()!= 0){
+            return Result.success(dishes);
+        }
+        dishes = userService.getDishByCategoryId(categoryId);
+        valueOperations.set(key,dishes);
         return Result.success(dishes);
     }
 
