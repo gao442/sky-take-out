@@ -2,6 +2,7 @@ package com.sky.mapper;
 
 import com.sky.entity.ShoppingCart;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
@@ -17,4 +18,7 @@ public interface ShoppingCartMapper {
 
 
     void add(ShoppingCart shoppingCart);
+
+    @Select("select * from shopping_cart where user_id=#{userId}")
+    List<ShoppingCart> listShoppingCartByUserId(Long userId);
 }

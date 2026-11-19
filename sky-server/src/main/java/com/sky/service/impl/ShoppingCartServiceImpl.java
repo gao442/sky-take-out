@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class ShoppingCartServiceImpl implements ShoppingCartService {
+public  class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Autowired
     private ShoppingCartMapper shoppingCartMapper;
@@ -68,5 +68,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         }
 
+    }
+
+    @Override
+    public List<ShoppingCart> listShoppingCart() {
+        Long userId = BaseContext.getCurrentId();
+        List<ShoppingCart> shoppingCartList = shoppingCartMapper.listShoppingCartByUserId(userId);
+        return shoppingCartList;
     }
 }
