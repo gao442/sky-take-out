@@ -17,4 +17,15 @@ public interface ReportMapper {
     Double turnover(@Param("begin") LocalDateTime begin,
                     @Param("end") LocalDateTime end,
                     @Param("status") Integer status);
+
+
+    /**
+     * 统计截止到指定时刻（不含）的累计注册用户数
+     */
+    Integer getTotalUserSum(@Param("end") LocalDateTime end);
+
+    /**
+     * 统计指定时间区间内新增注册的用户数
+     */
+    Integer getNewUser(@Param("begin") LocalDateTime begin, @Param("end") LocalDateTime end);
 }

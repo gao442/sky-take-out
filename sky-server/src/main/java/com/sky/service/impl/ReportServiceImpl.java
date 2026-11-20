@@ -4,10 +4,11 @@ import com.sky.entity.Orders;
 import com.sky.mapper.ReportMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.StringJoiner;
 
 @Service
@@ -30,4 +31,30 @@ public class ReportServiceImpl implements ReportService {
 
         return new TurnoverReportVO(dateSj.toString(), turnoverSj.toString());
     }
+
+    @Override
+    public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
+
+        StringJoiner dateSj = new StringJoiner(",");
+        StringJoiner newUserSj = new StringJoiner(",");
+        StringJoiner totalUserSj = new StringJoiner(",");
+        for (LocalDate date = begin; !date.isAfter(end); date = date.plusDays(1)) {
+            dateSj.add(date.toString());
+            //当天区间 [当天00:00, 次日00:00)
+            LocalDateTime dayBegin = date.atStartOfDay();
+            LocalDateTime dayEnd = date.plusDays(1).atStartOfDay();
+            //用户总量是累计值：截止到次日 00:00 前注册的所有用户
+            Integer totalUser = reportMapper.getTotalUserSum(dayEnd);
+            Integer newUser = reportMapper.getNewUser(dayBegin, dayEnd);
+            newUserSj.add(Integer.toString(newUser == null ? 0 : newUser));
+            totalUserSj.add(Integer.toString(totalUser == null ? 0 : totalUser));
+        }
+        UserReportVO userReportVO = new UserReportVO(dateSj.toString(),
+                totalUserSj.toString(),
+                newUserSj.toString());
+
+        return userReportVO;
+    }
+
+
 }
