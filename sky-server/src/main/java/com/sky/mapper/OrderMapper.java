@@ -7,7 +7,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -53,5 +55,9 @@ public interface OrderMapper {
      * @return
      */
     List<OrderVO> getHistoryOrders(@Param("currentId") Long currentId, @Param("status") Integer status);
+
+    @Select("select * from orders where status = #{status} and order_time < #{time}")
+    List<Orders> getTimeoutOrder(Integer status, LocalDateTime time);
+
 }
 
