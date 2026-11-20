@@ -33,5 +33,11 @@ public interface OrderService {
     void cancelOrder(Long id);
 
     void repetitionOrder(Long id);
+
+    /**
+     * 客户催单
+     * @param id
+     */
+    void reminder(Long id);
 }
 
