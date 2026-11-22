@@ -6,6 +6,7 @@ import com.sky.vo.OrderReportVO;
 import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,6 +63,11 @@ public class ReportController {
     ){
         SalesTop10ReportVO salesTop10ReportVO = reportService.getTop10(begin,end);
         return Result.success(salesTop10ReportVO);
+    }
+
+    @GetMapping("/export")
+    public void export(HttpServletResponse httpServletResponse){
+        reportService.export(httpServletResponse);
     }
 
 }

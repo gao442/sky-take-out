@@ -4,12 +4,20 @@ import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.ReportMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.service.WorkSpaceService;
+import com.sky.vo.*;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +28,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private ReportMapper reportMapper;
+    @Autowired
+    private WorkSpaceService workSpaceService;
 
     @Override
     public TurnoverReportVO getTurnoverStatistics(LocalDate begin, LocalDate end) {
@@ -108,6 +118,68 @@ public class ReportServiceImpl implements ReportService {
                 .numberList(topNumberSj.toString())
                 .build();
     }
+/*
+row 1	第 2 行	运营数据报表（B2:G2 合并，浅蓝底，宋体 18 号加粗居中）
+row 2	第 3 行	时间：（B3:G3 合并，右对齐，cell(1) 写时间范围）
+row 3	第 4 行	概览数据（B4:G4 合并，浅黄底，宋体 13 号加粗居中）
+row 4	第 5 行	cell(1) 营业额 | cell(2) 货币格 | cell(3) 订单完成率 | cell(4) 百分比格 | cell(5) 新增用户数 | cell(6) 整数格
+row 5	第 6 行	cell(1) 有效订单 | cell(2) 整数格 | cell(3) 平均客单价 | cell(4) 货币格 | cell(5~6) 空白带边框
+row 6	第 7 行	明细数据（B7:G7 合并，浅黄底，宋体 13 号加粗居中）
+row 7	第 8 行	表头：日期 | 营业额 | 有效订单 | 订单完成率 | 平均客单价 | 新增用户数
+row 8 ~ 37	第 9~38 行	预留 30 行带细边框、居中对齐及货币/百分比格式的空白明细行，可直接 getRow(8 + i) 填数
+ */
+    @Override
+    public void export(HttpServletResponse httpServletResponse) {
+        //查数据(30天)
+        BusinessDataVO businessData = workSpaceService.getBusinessData(LocalDate.now().minusDays(30).atStartOfDay(), LocalDate.now().atStartOfDay());
+        //写入变革
+        //基于模板文件在内存中创建一个excel文件
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板.xlsx");
+        if (in == null) {
+            throw new RuntimeException("运营数据报表模板不存在");
+        }
+        try (XSSFWorkbook excel = new XSSFWorkbook(in)) {
+            XSSFSheet sheet1 = excel.getSheet("Sheet1");
 
+            //时间区间（第3行B列）：30天前 至 昨天
+            LocalDate beginDate = LocalDate.now().minusDays(30);
+            LocalDate endDate = LocalDate.now().minusDays(1);
+            sheet1.getRow(2)
+                    .getCell(1)
+                    .setCellValue("时间:" + beginDate + "至" + endDate);
+
+            //概览数据（第5、6行）：cell(1)/cell(3) 是标题，值写在 cell(2)/cell(4)/cell(6)
+            sheet1.getRow(4).getCell(2).setCellValue(businessData.getTurnover());
+            sheet1.getRow(4).getCell(4).setCellValue(businessData.getOrderCompletionRate());
+            sheet1.getRow(4).getCell(6).setCellValue(businessData.getNewUsers());
+            sheet1.getRow(5).getCell(2).setCellValue(businessData.getValidOrderCount());
+            sheet1.getRow(5).getCell(4).setCellValue(businessData.getUnitPrice());
+
+            //明细数据（第9~38行，共30行）：逐天查询，保证每行金额与日期对应
+            for (int i = 0; i < 30; i++) {
+                LocalDate date = beginDate.plusDays(i);
+                BusinessDataVO dailyData = workSpaceService.getBusinessData(
+                        date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+                Row row = sheet1.getRow(8 + i);
+                row.getCell(1).setCellValue(date.toString());
+                row.getCell(2).setCellValue(dailyData.getTurnover());
+                row.getCell(3).setCellValue(dailyData.getValidOrderCount());
+                row.getCell(4).setCellValue(dailyData.getOrderCompletionRate());
+                row.getCell(5).setCellValue(dailyData.getUnitPrice());
+                row.getCell(6).setCellValue(dailyData.getNewUsers());
+            }
+
+            //通过输出流下载表格
+            httpServletResponse.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            httpServletResponse.setHeader("Content-Disposition",
+                    "attachment;filename=" + URLEncoder.encode("运营数据报表.xlsx", StandardCharsets.UTF_8));
+            try (ServletOutputStream outputStream = httpServletResponse.getOutputStream()) {
+                excel.write(outputStream);
+                outputStream.flush();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("导出运营数据报表失败", e);
+        }
+    }
 
 }
