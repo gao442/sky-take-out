@@ -41,6 +41,15 @@ public interface OrderMapper {
     void update(Orders orders);
 
     /**
+     * 按预期原状态原子更新订单信息（CAS 乐观锁，防止并发状态覆盖）
+     * @param orders 更新内容
+     * @param expectedStatus 期望的当前订单状态
+     * @return 受影响行数
+     */
+    int updateWithExpectedStatus(@Param("orders") Orders orders,
+                                 @Param("expectedStatus") Integer expectedStatus);
+
+    /**
      * 根据id查询订单
      * @param id
      * @return

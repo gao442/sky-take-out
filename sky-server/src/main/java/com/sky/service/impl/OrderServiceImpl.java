@@ -220,22 +220,22 @@ public class OrderServiceImpl implements OrderService {
         }
         Integer status = order.getStatus();
         if (Orders.PENDING_PAYMENT.equals(status)) {
-            //待付款：直接取消
-            orderMapper.update(Orders.builder()
+            //待付款：直接原子取消
+            updateOrderStatusAtomic(Orders.builder()
                     .id(id)
                     .status(Orders.CANCELLED)
                     .cancelReason("用户取消")
                     .cancelTime(LocalDateTime.now())
-                    .build());
+                    .build(), Orders.PENDING_PAYMENT);
         } else if (Orders.TO_BE_CONFIRMED.equals(status)) {
-            //已支付待接单：模拟退款后再取消
-            orderMapper.update(Orders.builder()
+            //已支付待接单：模拟退款后原子取消，防止与商家接单/拒单并发冲突
+            updateOrderStatusAtomic(Orders.builder()
                     .id(id)
                     .status(Orders.CANCELLED)
                     .payStatus(Orders.REFUND)
                     .cancelReason("用户取消")
                     .cancelTime(LocalDateTime.now())
-                    .build());
+                    .build(), Orders.TO_BE_CONFIRMED);
         } else {
             //已接单/派送中/已完成等状态不可取消
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
@@ -395,6 +395,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 按预期原状态原子更新订单，若受影响行数为 0 说明已被并发修改，直接抛出状态异常
+     */
+    private void updateOrderStatusAtomic(Orders orders, Integer expectedStatus) {
+        int rows = orderMapper.updateWithExpectedStatus(orders, expectedStatus);
+        if (rows == 0) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+    }
+
+    /**
      * 接单
      *
      * @param ordersConfirmDTO
@@ -406,7 +416,7 @@ public class OrderServiceImpl implements OrderService {
                 .id(ordersConfirmDTO.getId())
                 .status(Orders.CONFIRMED)
                 .build();
-        orderMapper.update(orders);
+        updateOrderStatusAtomic(orders, Orders.TO_BE_CONFIRMED);
     }
 
     /**
@@ -431,7 +441,7 @@ public class OrderServiceImpl implements OrderService {
             orders.setPayStatus(Orders.REFUND);
         }
 
-        orderMapper.update(orders);
+        updateOrderStatusAtomic(orders, Orders.TO_BE_CONFIRMED);
     }
 
     /**
@@ -456,7 +466,7 @@ public class OrderServiceImpl implements OrderService {
             orders.setPayStatus(Orders.REFUND);
         }
 
-        orderMapper.update(orders);
+        updateOrderStatusAtomic(orders, ordersDB.getStatus());
     }
 
     /**
@@ -471,7 +481,7 @@ public class OrderServiceImpl implements OrderService {
                 .id(id)
                 .status(Orders.DELIVERY_IN_PROGRESS)
                 .build();
-        orderMapper.update(orders);
+        updateOrderStatusAtomic(orders, Orders.CONFIRMED);
     }
 
     /**
@@ -487,7 +497,7 @@ public class OrderServiceImpl implements OrderService {
                 .status(Orders.COMPLETED)
                 .deliveryTime(LocalDateTime.now())
                 .build();
-        orderMapper.update(orders);
+        updateOrderStatusAtomic(orders, Orders.DELIVERY_IN_PROGRESS);
     }
 
 }
