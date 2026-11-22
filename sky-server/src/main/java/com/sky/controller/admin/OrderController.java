@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.*;
  * 订单管理
  */
 @RestController("adminOrderController")
+/*
+如果遇到重名的了：
+@Autowired
+@Qualifier("adminOrderService")
+private OrderService orderService;
+ */
 @RequestMapping("/admin/order")
 @Slf4j
 public class OrderController {
