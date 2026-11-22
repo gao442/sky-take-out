@@ -12,4 +12,26 @@
         where create_time &gt;= #{begin}
           and create_time &lt; #{end}
     </select>
+    <select id="getOrderSj" resultType="java.lang.Integer">
+        select count(id) from orders
+        <where>
+            <if test="status != null">
+                status=#{status}
+            </if>
+            and order_time &gt;= #{begin}
+            and order_time &lt; #{end}
+        </where>
+    </select>
+    <select id="getSalesTop10" resultType="com.sky.dto.GoodsSalesDTO">
+        select od.name, sum(od.number) as number
+        from order_detail od
+        inner join orders o on od.order_id = o.id
+        where o.status = #{status}
+          and o.order_time &gt;= #{begin}
+          and o.order_time &lt; #{end}
+        group by od.name
+        order by number desc
+        limit 10
+    </select>
+
 </mapper>

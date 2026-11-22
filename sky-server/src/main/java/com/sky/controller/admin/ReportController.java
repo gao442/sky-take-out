@@ -2,6 +2,8 @@ package com.sky.controller.admin;
 
 import com.sky.result.Result;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,29 @@ public class ReportController {
 
         UserReportVO userReportVO = reportService.getUserStatistics(begin,end);
         return Result.success(userReportVO);
+    }
+
+    @GetMapping("/ordersStatistics")
+    public Result<OrderReportVO> getOrderStatistics(
+            @RequestParam("begin") @DateTimeFormat(pattern = "yyyy-MM-dd")
+            LocalDate begin,
+            @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd")
+            LocalDate end
+    ){
+        OrderReportVO orderReportVO = reportService.getOrderStatistics(begin,end);
+
+        return Result.success(orderReportVO);
+    }
+
+    @GetMapping("/top10")
+    public Result<SalesTop10ReportVO> getTop10(
+            @RequestParam("begin") @DateTimeFormat(pattern = "yyyy-MM-dd")
+            LocalDate begin,
+            @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd")
+            LocalDate end
+    ){
+        SalesTop10ReportVO salesTop10ReportVO = reportService.getTop10(begin,end);
+        return Result.success(salesTop10ReportVO);
     }
 
 }
